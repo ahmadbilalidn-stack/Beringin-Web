@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #fd0505, #ff8401);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 320px;
+      text-align: center;
+    }
+
+    h2 { color: #333; }
+
+    input[type="text"], input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 5px 0 10px 5%;
+      font-size: 14px;
+      color: #333;
+    }
+
+    button {
+      background-color: #2575fc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button:hover { background-color: #1b5fd1; }
+
+    p { margin-top: 10px; }
+
+    a { color: #2575fc; text-decoration: none; }
+
+    #message { color: red; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <div class="remember">
+        <input type="checkbox" id="rememberMe"> <label for="rememberMe">Ingat saya</label>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p>Belum punya akun? <a href="SignUp.html">Daftar di sini!</a></p>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    // Jika ada rememberUser di localStorage -> restore ke sessionStorage dan redirect
+    const remembered = JSON.parse(localStorage.getItem("rememberUser") || "null");
+    if (remembered) {
+      // Pulihkan session agar halaman lain melihat user ter-login
+      sessionStorage.setItem("currentUser", remembered.username);
+      sessionStorage.setItem("loginRole", remembered.role);
+      // Redirect sesuai role
+      if (remembered.role === "admin") window.location.href = "Admin.html";
+      else window.location.href = "Beranda.html";
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const rememberMe = document.getElementById("rememberMe").checked;
+
+      const usersData = JSON.parse(localStorage.getItem("usersData")) || {};
+
+      // Admin login: username 'adli', password '12345'
+      if (username === "adli" && password === "12345") {
+        const data = { username: "adli", role: "admin" };
+        // simpan "ingat saya" jika dicentang
+        if (rememberMe) localStorage.setItem("rememberUser", JSON.stringify(data));
+        sessionStorage.setItem("currentUser", "adli");
+        sessionStorage.setItem("loginRole", "admin");
+        window.location.href = "Admin.html";
+        return;
+      }
+
+      // User biasa
+      if (!usersData[username] || usersData[username].password !== password) {
+        document.getElementById("message").textContent = "Username atau password salah!";
+        return;
+      }
+
+      const data = { username, role: "user" };
+      if (rememberMe) localStorage.setItem("rememberUser", JSON.stringify(data));
+      sessionStorage.setItem("currentUser", username);
+      sessionStorage.setItem("loginRole", "user");
+      window.location.href = "Beranda.html";
+    });
+  </script>
+</body>
+</html>

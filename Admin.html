@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Pesanan Pelanggan | Beringin Sawo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #ff0004, #ff891c);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-left img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .navbar-left h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .navbar-right a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .navbar-right a:hover { text-decoration: underline; }
+
+    .content {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .content h2 {
+      color: #ff0004;
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    .filter { margin-bottom: 20px; }
+    select { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px; }
+
+    .order-list {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      text-align: left;
+    }
+
+    .order-card {
+      border-bottom: 1px solid #ddd;
+      padding: 20px 0;
+    }
+    .order-card:last-child { border-bottom: none; }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .order-header h3 { margin: 0; color: #ff5e62; }
+    .order-header span { font-size: 14px; color: #666; }
+
+    .item-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .item {
+      background: #fff7f7;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.3s;
+    }
+    .item:hover { transform: translateY(-3px); }
+
+    .item img {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 8px;
+    }
+
+    .item-info p { margin: 3px 0; font-size: 14px; }
+    .item-info strong { color: #ff5e62; }
+
+    .total-harga {
+      text-align: right;
+      font-weight: bold;
+      color: #ff5e62;
+      margin-top: 10px;
+    }
+
+    .status-section {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-section select {
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+    }
+
+    .save-status {
+      background: linear-gradient(90deg, #ff5e62, #ff9966);
+      color: white;
+      border: none;
+      padding: 7px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .save-status:hover { opacity: 0.9; }
+
+    .btn-clear, .btn-clear-user {
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 25px;
+      transition: 0.3s;
+    }
+    .btn-clear { background: #ff5e62; }
+    .btn-clear:hover { background: #e34d4d; }
+    .btn-clear-user { background: #ff891c; margin-left: 10px; }
+    .btn-clear-user:hover { background: #e67e22; }
+
+    /* 🔔 Notifikasi popup */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-left">
+      <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="Logo">
+      <h1>Beringin Sawo - Admin</h1>
+    </div>
+    <div class="navbar-right">
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- 🔊 Suara notifikasi -->
+  <audio id="notifSound" src="Notifikasi.mp3" preload="auto"></audio>
+
+  <div class="content">
+    <h2>📦 Daftar Pesanan Pelanggan</h2>
+
+    <div class="filter">
+      <label for="userFilter"><strong>Filter berdasarkan pengguna:</strong></label>
+      <select id="userFilter"><option value="all">Semua Pengguna</option></select>
+    </div>
+
+    <div id="orderList" class="order-list">
+      <p class="no-orders">Belum ada pesanan yang masuk.</p>
+    </div>
+
+    <div id="buttonSection">
+      <button id="clearOrdersBtn" class="btn-clear" style="display:none;">Hapus Semua Pesanan</button>
+      <button id="clearUserOrdersBtn" class="btn-clear-user" style="display:none;">Hapus Pesanan Pengguna Ini</button>
+    </div>
+  </div>
+
+  <script>
+    (function restore() {
+      const remembered = JSON.parse(localStorage.getItem("rememberUser") || "null");
+      if (remembered && !sessionStorage.getItem("currentUser")) {
+        sessionStorage.setItem("currentUser", remembered.username);
+        sessionStorage.setItem("loginRole", remembered.role);
+      }
+    })();
+
+    const currentUser = sessionStorage.getItem("currentUser");
+    const role = sessionStorage.getItem("loginRole");
+    if (!currentUser || role !== "admin") window.location.href = "index.html";
+
+    const orderList = document.getElementById("orderList");
+    const clearAllBtn = document.getElementById("clearOrdersBtn");
+    const clearUserBtn = document.getElementById("clearUserOrdersBtn");
+    const userFilter = document.getElementById("userFilter");
+    const toast = document.getElementById("toast");
+    const notifSound = document.getElementById("notifSound");
+
+    let allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+    let prevOrdersCount = allOrders.length;
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    function parsePrice(price) {
+      return parseInt(price.replace(/[^\d]/g, "")) || 0;
+    }
+
+    function populateUserFilter() {
+      const users = [...new Set(allOrders.map(o => o.user))];
+      userFilter.innerHTML = '<option value="all">Semua Pengguna</option>' +
+        users.map(u => `<option value="${u}">${u}</option>`).join("");
+    }
+
+    function renderOrders(filterUser = "all") {
+      allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+      if (allOrders.length === 0) {
+        orderList.innerHTML = '<p class="no-orders">Belum ada pesanan yang masuk.</p>';
+        clearAllBtn.style.display = "none";
+        clearUserBtn.style.display = "none";
+        return;
+      }
+
+      const filteredOrders = filterUser === "all" ? allOrders : allOrders.filter(o => o.user === filterUser);
+      if (filteredOrders.length === 0) {
+        orderList.innerHTML = `<p class="no-orders">Tidak ada pesanan dari pengguna <strong>${filterUser}</strong>.</p>`;
+        clearAllBtn.style.display = "none";
+        clearUserBtn.style.display = "none";
+        return;
+      }
+
+      orderList.innerHTML = filteredOrders.map((order, index) => {
+        const totalHarga = order.items.reduce((sum, item) => sum + parsePrice(item.price), 0);
+        const totalFormatted = "Rp" + totalHarga.toLocaleString("id-ID");
+        const currentStatus = order.status || "Sedang diproses 🧑‍🍳";
+        const alamat = order.alamat || "(Alamat belum dimasukkan)";
+
+        return `
+        <div class="order-card">
+          <div class="order-header">
+            <h3>👤 ${order.user}</h3>
+            <span>${order.waktu}</span>
+          </div>
+
+          <p><strong>📍 Alamat:</strong> ${alamat}</p>
+
+          <div class="item-list">
+            ${order.items.map(item => `
+              <div class="item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-info">
+                  <p><strong>${item.name}</strong></p>
+                  <p>${item.price}</p>
+                </div>
+              </div>`).join("")}
+          </div>
+
+          <p class="total-harga">Total Pesanan: ${totalFormatted}</p>
+
+          <div class="status-section">
+            <div>
+              <strong>Status:</strong>
+              <select id="status-${index}">
+                <option value="Sedang diproses 🧑‍🍳" ${currentStatus === "Sedang diproses 🧑‍🍳" ? "selected" : ""}>Sedang diproses 🧑‍🍳</option>
+                <option value="Sedang dimasak 🍳" ${currentStatus === "Sedang dimasak 🍳" ? "selected" : ""}>Sedang dimasak 🍳</option>
+                <option value="Dalam pengantaran 🚚" ${currentStatus === "Dalam pengantaran 🚚" ? "selected" : ""}>Dalam pengantaran 🚚</option>
+                <option value="Selesai ✅" ${currentStatus === "Selesai ✅" ? "selected" : ""}>Selesai ✅</option>
+                <option value="Dibatalkan ❌" ${currentStatus === "Dibatalkan ❌" ? "selected" : ""}>Dibatalkan ❌</option>
+              </select>
+            </div>
+            <button class="save-status" onclick="updateStatus(${index})">Simpan</button>
+          </div>
+        </div>`;
+      }).join("");
+
+      clearAllBtn.style.display = "inline-block";
+      clearUserBtn.style.display = filterUser !== "all" ? "inline-block" : "none";
+    }
+
+    window.updateStatus = function(index) {
+      const select = document.getElementById(`status-${index}`);
+      allOrders[index].status = select.value;
+      localStorage.setItem("allOrders", JSON.stringify(allOrders));
+      showToast("✅ Status pesanan diperbarui!");
+      renderOrders(userFilter.value);
+    };
+
+    userFilter.addEventListener("change", () => renderOrders(userFilter.value));
+
+    clearAllBtn.addEventListener("click", () => {
+      if (confirm("Yakin ingin menghapus semua pesanan?")) {
+        localStorage.removeItem("allOrders");
+        allOrders = [];
+        populateUserFilter();
+        renderOrders();
+      }
+    });
+
+    clearUserBtn.addEventListener("click", () => {
+      const user = userFilter.value;
+      if (confirm(`Yakin ingin menghapus semua pesanan milik ${user}?`)) {
+        allOrders = allOrders.filter(o => o.user !== user);
+        localStorage.setItem("allOrders", JSON.stringify(allOrders));
+        populateUserFilter();
+        userFilter.value = "all";
+        renderOrders();
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("rememberUser");
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    populateUserFilter();
+    renderOrders();
+
+    // 🔥 Auto-refresh pesanan setiap 3 detik + bunyi notifikasi
+    setInterval(() => {
+      const latest = JSON.parse(localStorage.getItem("allOrders")) || [];
+      if (latest.length > prevOrdersCount) {
+        showToast("🆕 Pesanan baru masuk!");
+        notifSound.play().catch(() => {}); // 🔊 mainkan suara
+      }
+      if (JSON.stringify(latest) !== JSON.stringify(allOrders)) {
+        allOrders = latest;
+        prevOrdersCount = latest.length;
+        populateUserFilter();
+        renderOrders(userFilter.value);
+      }
+    }, 3000);
+  </script>
+</body>
+</html>

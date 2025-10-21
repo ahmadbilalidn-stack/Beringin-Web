@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produk - Beringin Sawo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    /* --- NAVBAR --- */
+    .navbar {
+      background: linear-gradient(90deg, #ff0004, #ff891c);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-left img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .navbar-left h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .navbar-right a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+      position: relative;
+    }
+
+    .navbar-right a:hover { text-decoration: underline; }
+
+    .cart-link { position: relative; display: inline-block; }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -15px;
+      background: white;
+      color: #ff0004;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .cart-count.hidden { display: none; }
+
+    /* --- PRODUK LIST --- */
+    .content { padding: 40px; text-align: center; }
+
+    .content h2 {
+      color: #ff0004;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 0 30px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      transition: 0.3s;
+    }
+
+    .product-card:hover { transform: translateY(-5px); }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 10px;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .product-card h3 { color: #ff5e62; margin: 10px 0 5px; }
+
+    .product-card p { margin: 5px 0; color: #444; }
+
+    .buy-btn {
+      background: linear-gradient(90deg, #ff5e62, #ff9966);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .buy-btn:hover { opacity: 0.9; }
+
+    .toast {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="navbar-left">
+      <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="Logo">
+      <h1>Beringin Sawo</h1>
+    </div>
+    <div class="navbar-right">
+      <a href="Beranda.html">Beranda</a>
+      <a href="Produk.html">Produk</a>
+      <a href="Keranjang.html" class="cart-link">Keranjang
+        <span id="cartCount" class="cart-count hidden">0</span>
+      </a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div class="content">
+    <h2>Daftar Produk Kami</h2>
+    <div class="product-grid">
+      <div class="product-card">
+        <img src="https://d39wptbp5at4nd.cloudfront.net/media/82655_original_post-81843-a9afd0a0-24b1-4f8b-8945-0985232d7b4b-2020-02-02t19-49-05.767-07-00.jpg" alt="Ayam Bakar">
+        <h3>Ayam Bakar</h3>
+        <p>Rp25.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+
+      <div class="product-card">
+        <img src="https://bing.com/th?id=OSK.ffa74053ae195531f8c3106e1233e73a" alt="Ayam Gulai">
+        <h3>Ayam Gulai</h3>
+        <p>Rp25.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+
+      <div class="product-card">
+        <img src="https://bing.com/th?id=OSK.1f16861563f4aeb8d07c8cb69f725136" alt="Ayam Goreng">
+        <h3>Ayam Goreng</h3>
+        <p>Rp25.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+
+      <div class="product-card">
+        <img src="https://bing.com/th?id=OSK.3d77672a9d29e58d3a707aeaa2f80130" alt="Rendang">
+        <h3>Rendang</h3>
+        <p>Rp25.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+
+      <div class="product-card">
+        <img src="https://bing.com/th?id=OSK.79a48c5672b438a03a494338f892174b" alt="Telur">
+        <h3>Telur</h3>
+        <p>Rp7.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+
+      <div class="product-card">
+        <img src="https://bing.com/th?id=OSK.260bb69befe17ebec82e20da4b782d93" alt="Cumi">
+        <h3>Cumi</h3>
+        <p>Rp10.000</p>
+        <button class="buy-btn">Tambah ke Keranjang</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // restore remembered into session if needed
+    (function restore() {
+      const remembered = JSON.parse(localStorage.getItem("rememberUser") || "null");
+      if (remembered && !sessionStorage.getItem("currentUser")) {
+        sessionStorage.setItem("currentUser", remembered.username);
+        sessionStorage.setItem("loginRole", remembered.role);
+      }
+    })();
+
+    const currentUser = sessionStorage.getItem("currentUser");
+    const role = sessionStorage.getItem("loginRole");
+    if (!currentUser || role !== "user") {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", function() {
+      localStorage.removeItem("rememberUser");
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    // toast function
+    const toast = document.getElementById("toast");
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    const cartKey = `cart_${currentUser}`;
+    let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+    const cartCountElem = document.getElementById("cartCount");
+
+    function updateCartCount() {
+      if (cart.length === 0) cartCountElem.classList.add("hidden");
+      else {
+        cartCountElem.classList.remove("hidden");
+        cartCountElem.textContent = cart.length;
+      }
+    }
+
+    updateCartCount();
+
+    document.querySelectorAll(".buy-btn").forEach((button, index) => {
+      button.addEventListener("click", () => {
+        const productCards = document.querySelectorAll(".product-card");
+        const product = productCards[index];
+        const name = product.querySelector("h3").textContent;
+        const price = product.querySelector("p").textContent;
+        const image = product.querySelector("img").src;
+
+        cart.push({ name, price, image });
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        updateCartCount();
+        showToast(`🛒 ${name} berhasil ditambahkan ke keranjang!`);
+      });
+    });
+  </script>
+</body>
+</html>
+

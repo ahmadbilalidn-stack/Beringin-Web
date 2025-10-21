@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Pesanan - Beringin Sawo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #ff0004, #ff891c);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-left img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .navbar-left h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .navbar-right a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .navbar-right a:hover {
+      text-decoration: underline;
+    }
+
+    .content {
+      padding: 40px;
+      text-align: center;
+    }
+
+    .content h2 {
+      color: #ff0004;
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    .order {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      text-align: left;
+    }
+
+    .order h3 {
+      margin: 0;
+      color: #ff5e62;
+    }
+
+    .order p {
+      margin: 8px 0;
+      color: #333;
+    }
+
+    .item-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .item {
+      background: #fff7f7;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .item img {
+      width: 100%;
+      height: 90px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
+
+    .item-info p {
+      margin: 3px 0;
+      font-size: 13px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #ff5e62;
+    }
+
+    .no-order {
+      color: #555;
+      font-style: italic;
+      margin-top: 30px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 9999;
+    }
+
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-left">
+      <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="Logo" />
+      <h1>Beringin Sawo</h1>
+    </div>
+    <div class="navbar-right">
+      <a href="Beranda.html">Beranda</a>
+      <a href="Produk.html">Produk</a>
+      <a href="Keranjang.html">Keranjang</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div class="content">
+    <h2>Status Pesanan Anda</h2>
+    <div id="orderContainer" class="order">
+      <p class="no-order">Kamu belum memesan apapun 🛒</p>
+    </div>
+  </div>
+
+  <script>
+    (function restore() {
+      const remembered = JSON.parse(localStorage.getItem("rememberUser") || "null");
+      if (remembered && !sessionStorage.getItem("currentUser")) {
+        sessionStorage.setItem("currentUser", remembered.username);
+        sessionStorage.setItem("loginRole", remembered.role);
+      }
+    })();
+
+    const currentUser = sessionStorage.getItem("currentUser");
+    const role = sessionStorage.getItem("loginRole");
+    if (!currentUser || role !== "user") window.location.href = "index.html";
+
+    const orderContainer = document.getElementById("orderContainer");
+    const toast = document.getElementById("toast");
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function renderOrders() {
+      const allOrders = JSON.parse(localStorage.getItem("allOrders")) || [];
+      const myOrders = allOrders.filter(o => o.user === currentUser);
+
+      if (myOrders.length === 0) {
+        orderContainer.innerHTML = '<p class="no-order">Kamu belum memesan apapun 🛒</p>';
+        return;
+      }
+
+      orderContainer.innerHTML = myOrders.map(order => `
+        <div>
+          <h3>🧾 Pesanan pada ${order.waktu}</h3>
+          <p><strong>📍 Alamat:</strong> ${order.alamat || "-"}</p>
+          <div class="item-list">
+            ${order.items.map(item => `
+              <div class="item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-info">
+                  <p><strong>${item.name}</strong></p>
+                  <p>${item.price}</p>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+          <p class="status">Status: ${order.status || "Sedang diproses 🧑‍🍳"}</p>
+          <hr>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("rememberUser");
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    // 🔥 Real-time update setiap 3 detik (tanpa refresh)
+    let lastData = JSON.stringify(localStorage.getItem("allOrders"));
+    renderOrders();
+    setInterval(() => {
+      const newData = JSON.stringify(localStorage.getItem("allOrders"));
+      if (newData !== lastData) {
+        renderOrders();
+        showToast("🔄 Status pesanan diperbarui!");
+        lastData = newData;
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
